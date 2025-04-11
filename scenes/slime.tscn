@@ -51,6 +51,7 @@ autoplay = "default"
 frame_progress = 0.973932
 
 [node name="Killzone" parent="." instance=ExtResource("2_n6pvg")]
+damage = 20.0
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Killzone"]
 position = Vector2(0, -6)
