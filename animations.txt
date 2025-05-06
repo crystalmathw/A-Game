@@ -1,0 +1,10 @@
+animations:
+	death
+	idle_down
+	idle_horizontal
+	idle_up
+	run_down
+	run_horizontal
+	run_horizontal_down
+	run_horizontal_up
+	run_up

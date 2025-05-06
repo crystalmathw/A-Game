@@ -1,8 +1,17 @@
-[gd_scene load_steps=5 format=3 uid="uid://cw3nl70rihasa"]
+[gd_scene load_steps=5 format=3 uid="uid://b0wor4nl4ythj"]
 
-[ext_resource type="Script" uid="uid://bfwhjir2r07q4" path="res://scripts/weapon.gd" id="1_bmw2d"]
 [ext_resource type="Texture2D" uid="uid://cj08ulxveu353" path="res://assets/sprites/Knive.png" id="1_uxn4k"]
 [ext_resource type="PackedScene" uid="uid://djhwvoe8h4m54" path="res://scenes/components/attack_component.tscn" id="2_bmw2d"]
+
+[sub_resource type="GDScript" id="GDScript_uxn4k"]
+resource_name = "weapon_script"
+script/source = "extends Node2D
+
+var velocity: Vector2
+
+func _physics_process(delta):
+	position += velocity * delta
+"
 
 [sub_resource type="CapsuleShape2D" id="CapsuleShape2D_8fp1k"]
 radius = 2.0
@@ -10,7 +19,7 @@ height = 16.0
 
 [node name="Weapon" type="Node2D"]
 scale = Vector2(1.5, 1.5)
-script = ExtResource("1_bmw2d")
+script = SubResource("GDScript_uxn4k")
 
 [node name="Sprite2D" type="Sprite2D" parent="."]
 position = Vector2(2, 0)
