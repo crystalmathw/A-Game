@@ -1,19 +1,14 @@
 extends CharacterBody2D
 
-@export var SPEED: float = 130.0
-@export var SPRINT: float = 2.0
+@export var SPEED: float = 25
 
-var weapon = preload("res://scenes/weapon.tscn")
-
-@onready var player: CharacterBody2D = self
+@onready var character: CharacterBody2D = self
 @onready var animated_sprite: AnimatedSprite2D = $AnimatedSprite2D
-@onready var animation: AnimationPlayer = $AnimationPlayer
 @onready var health: HealthComponent = $HealthComponent
 @onready var hit_timer: Timer = $HitTimer
 @onready var restart_timer: Timer = $RestartTimer
 @onready var attack_timer: Timer = $AttackTimer
 
-var speedMultiplier: float = 1
 var lastDirection: float = 0
 var startingPosition: Vector2
 var zIndex: int
@@ -22,20 +17,19 @@ var attacking: bool = false
 func _ready() -> void:
 	health.connect("take_damage", Callable(self, "_damage_taken"))
 	health.connect("is_dead", Callable(self, "_died"))
-	startingPosition = player.position
-	animation.play("RESET")
+	hit_timer.connect("timeout", Callable(self, "_on_hit_timer_timeout"))
+	restart_timer.connect("timeout", Callable(self, "_on_restart_timer_timeout"))
+	attack_timer.connect("timeout", Callable(self, "_on_attack_timer_timeout"))
+	startingPosition = character.position
 
 func _physics_process(_delta: float) -> void:
-	player.z_index = int(global_position.y)
-	#print(health.getHealth())
+	character.z_index = int(global_position.y)
 	movement()
-	if Input.is_mouse_button_pressed(MOUSE_BUTTON_LEFT) and attacking == false:
-		attack()
 
-func movement() -> void:
-	# Movement and animations
-	var direction_x := Input.get_axis("move_left", "move_right")
-	var direction_y := Input.get_axis("move_up", "move_down")
+func movement() -> void:# Movement and animations
+	var direction_x := 0 #dynamic change by ai stuff
+	var direction_y := 0
+	
 	# Flip the sprite
 	if direction_x > 0:
 		animated_sprite.flip_h = false
@@ -58,17 +52,11 @@ func movement() -> void:
 		else:
 			animated_sprite.play("run_horizontal")
 
-	
-	# Sprinting
-	if Input.is_action_pressed("sprint") == true:
-		speedMultiplier = SPRINT
-	else:
-		speedMultiplier = 1
-		
+
 	var direction = Vector2(direction_x, direction_y)
 	if direction.length() > 0:
 		direction = direction.normalized()
-		velocity = direction * SPEED * speedMultiplier
+		velocity = direction * SPEED
 		if direction_x != 0:
 			lastDirection = 0
 		elif direction_y != 0:
@@ -80,38 +68,28 @@ func movement() -> void:
 	move_and_slide()
 
 func attack() -> void:
-	var weapon_instance = weapon.instantiate()
-	weapon_instance.position = global_position + Vector2(0,-10)
+	#attack scipt
 	
-	var direction = (get_global_mouse_position() - global_position).normalized()
-	weapon_instance.velocity = direction * 400
-	weapon_instance.rotation = direction.angle()
-	
-	get_tree().current_scene.add_sibling(weapon_instance)
 	attacking = true
 	attack_timer.start()
 
 func _on_attack_timer_timeout() -> void:
 	attacking = false
 
-
 func _damage_taken():
 	animated_sprite.modulate = Color(1, 0, 0, 1)
 	hit_timer.start()
 	
-func _on_timer_timeout() -> void:
+func _on_hit_timer_timeout() -> void:
 	animated_sprite.modulate = Color(1, 1, 1, 1)
 
 func _died() -> void:
 	animated_sprite.play("death")
-	animation.play("DeathText FadeIn")
-	Engine.time_scale = 0.5
 	set_physics_process(false)
 	restart_timer.start()
 
 func _on_restart_timer_timeout() -> void:
-	Engine.time_scale = 1
-	player.position = startingPosition
+	character.position = startingPosition
 	health.reset()
+	animated_sprite.play("idle")
 	set_physics_process(true)
-	animation.play("DeathText FadeOut")

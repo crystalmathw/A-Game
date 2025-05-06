@@ -1,0 +1,29 @@
+[gd_scene load_steps=4 format=3 uid="uid://cpdyidcqkn2yd"]
+
+[ext_resource type="Script" uid="uid://bjf80f4g7syyl" path="res://scripts/standart_character.gd" id="1_67bue"]
+[ext_resource type="PackedScene" uid="uid://dijuhygqll7aj" path="res://scenes/components/health_component.tscn" id="2_ov2sr"]
+[ext_resource type="PackedScene" uid="uid://blobhnhd1n3vg" path="res://scenes/components/hit_box_component.tscn" id="3_pfug6"]
+
+[node name="StandartCharacter" type="CharacterBody2D"]
+script = ExtResource("1_67bue")
+SPEED = 300.0
+
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
+
+[node name="Hitbox" type="CollisionShape2D" parent="."]
+
+[node name="HealthComponent" parent="." instance=ExtResource("2_ov2sr")]
+
+[node name="HitBoxComponent" parent="." node_paths=PackedStringArray("health_component") instance=ExtResource("3_pfug6")]
+health_component = NodePath("../HealthComponent")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="HitBoxComponent"]
+
+[node name="AttackTimer" type="Timer" parent="."]
+
+[node name="HitTimer" type="Timer" parent="."]
+wait_time = 0.25
+
+[node name="RestartTimer" type="Timer" parent="."]
+wait_time = 1.6
+one_shot = true
